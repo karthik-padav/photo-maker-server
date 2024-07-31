@@ -3,9 +3,9 @@ const dotenv = require("dotenv").config();
 
 const app = express();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
-app.use("/api", require("./routes/default"));
+app.use("/", require("./routes/default"));
 app.use("/api/image", require("./routes/imagesRoutes"));
 
 app.listen(port, () => {
