@@ -9,7 +9,7 @@ const importDynamic = new Function("modulePath", "return import(modulePath)");
 
 const generateImage = asyncHandler(async (req, res) => {
   try {
-    // const { client } = await importDynamic("@gradio/client");
+    const { client } = await importDynamic("@gradio/client");
     // const HF_TOKEN = process.env.HF_TOKEN;
     // const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
     //   hf_token: HF_TOKEN,
