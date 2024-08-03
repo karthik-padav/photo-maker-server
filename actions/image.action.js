@@ -14,6 +14,8 @@ const generateImage = asyncHandler(async (req, res) => {
       ({ client } = await importDynamic("@gradio/client"));
     } catch (error) {
       console.error("Error loading module:", error);
+      res.status(500).json(error);
+      return;
     }
     // const HF_TOKEN = process.env.HF_TOKEN;
     // const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
