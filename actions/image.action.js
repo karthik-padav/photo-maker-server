@@ -26,17 +26,17 @@ const generateImage = asyncHandler(async (req, res) => {
   });
 
   const filename = `${uid(16)}.png`;
-  const s3Resp = await uploadToS3({
-    file: bgRmImg.data,
-    filePath: filename,
-  });
+  // const s3Resp = await uploadToS3({
+  //   file: bgRmImg.data,
+  //   filePath: filename,
+  // });
 
-  const imageDetails = await Image.create({
-    email: req.user.email,
-    imageURL: s3Resp.Location,
-  });
+  // const imageDetails = await Image.create({
+  //   email: req.user.email,
+  //   imageURL: s3Resp.Location,
+  // });
 
-  res.status(200).json(imageDetails);
+  res.status(200).json({ filename });
 });
 
 const getImage = asyncHandler(async (req, res) => {
