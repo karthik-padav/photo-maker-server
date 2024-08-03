@@ -4,8 +4,6 @@ const asyncHandler = require("express-async-handler");
 const { default: axios } = require("axios");
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
-// const AWS = require("aws-sdk");
-// const s3 = new AWS.S3();
 
 const importDynamic = new Function("modulePath", "return import(modulePath)");
 
@@ -36,7 +34,7 @@ const generateImage = asyncHandler(async (req, res) => {
       imageURL: s3Resp.Location,
     });
 
-    res.status(200).json({ filename });
+    res.status(200).json(imageDetails);
   } catch (error) {
     res.status(500).json(error);
   }
