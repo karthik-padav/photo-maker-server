@@ -11,32 +11,36 @@ const { uid } = require("uid");
 const importDynamic = new Function("modulePath", "return import(modulePath)");
 
 const generateImage = asyncHandler(async (req, res) => {
-  const { client } = await importDynamic("@gradio/client");
-  const HF_TOKEN = process.env.HF_TOKEN;
-  const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
-    hf_token: HF_TOKEN,
-  });
-  const result = await app.predict("/predict", [req.file.buffer]);
+  try {
+    const { client } = await importDynamic("@gradio/client");
+    const HF_TOKEN = process.env.HF_TOKEN;
+    const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
+      hf_token: HF_TOKEN,
+    });
+    const result = await app.predict("/predict", [req.file.buffer]);
 
-  const imgURL = `${process.env.HUGGING_FACE_SPACE_URL}file=${result?.data?.[0]?.path}`;
+    const imgURL = `${process.env.HUGGING_FACE_SPACE_URL}file=${result?.data?.[0]?.path}`;
 
-  const bgRmImg = await axios.get(imgURL, {
-    headers: { Authorization: `Bearer ${HF_TOKEN}` },
-    responseType: "arraybuffer",
-  });
+    const bgRmImg = await axios.get(imgURL, {
+      headers: { Authorization: `Bearer ${HF_TOKEN}` },
+      responseType: "arraybuffer",
+    });
 
-  const filename = `${uid(16)}.png`;
-  // const s3Resp = await uploadToS3({
-  //   file: bgRmImg.data,
-  //   filePath: filename,
-  // });
+    const filename = `${uid(16)}.png`;
+    const s3Resp = await uploadToS3({
+      file: bgRmImg.data,
+      filePath: filename,
+    });
 
-  // const imageDetails = await Image.create({
-  //   email: req.user.email,
-  //   imageURL: s3Resp.Location,
-  // });
+    const imageDetails = await Image.create({
+      email: req.user.email,
+      imageURL: s3Resp.Location,
+    });
 
-  res.status(200).json({ filename });
+    res.status(200).json({ filename });
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 const getImage = asyncHandler(async (req, res) => {
