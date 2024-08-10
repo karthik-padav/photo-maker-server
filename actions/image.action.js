@@ -5,18 +5,17 @@ const { default: axios } = require("axios");
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
 
-const importDynamic = new Function("modulePath", "return import(modulePath)");
-
 const generateImage = asyncHandler(async (req, res) => {
   try {
-    let client;
-    try {
-      ({ client } = await importDynamic("@gradio/client"));
-    } catch (error) {
-      console.error("Error loading module:", error);
-      res.status(500).json(error);
-      return;
-    }
+    //   let client;
+    //   try {
+    //     ({ client } = await importDynamic("@gradio/client"));
+    //   } catch (error) {
+    //     console.error("Error loading module:", error);
+    //     res.status(500).json(error);
+    //     return;
+    //   }
+
     // const HF_TOKEN = process.env.HF_TOKEN;
     // const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
     //   hf_token: HF_TOKEN,
@@ -30,18 +29,18 @@ const generateImage = asyncHandler(async (req, res) => {
     //   responseType: "arraybuffer",
     // });
 
-    // const filename = `${uid(16)}.png`;
-    // const s3Resp = await uploadToS3({
-    //   file: bgRmImg.data,
-    //   filePath: filename,
-    // });
+    const filename = `${uid(16)}.png`;
+    const s3Resp = await uploadToS3({
+      file: req.file.buffer,
+      filePath: filename,
+    });
 
-    // const imageDetails = await Image.create({
-    //   email: req.user.email,
-    //   imageURL: s3Resp.Location,
-    // });
+    const imageDetails = await Image.create({
+      email: req.user.email,
+      imageURL: s3Resp.Location,
+    });
 
-    res.status(200).json({ imageDetails: "" });
+    res.status(200).json(imageDetails);
   } catch (error) {
     res.status(500).json(error);
   }
@@ -51,7 +50,10 @@ const getImage = asyncHandler(async (req, res) => {
   if (!req?.user?.email)
     res.status(404).json({ message: "Email id not found." });
   else {
-    const images = await Image.find({ email: req.user.email });
+    console.log(req.user, "req.user");
+    const images = await Image.find({ email: req.user.email }).select(
+      "email _id imageURL"
+    );
     res.status(200).json(images);
   }
 });
