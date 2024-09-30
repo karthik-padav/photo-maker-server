@@ -13,9 +13,7 @@ async function uploadToS3(params) {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: filePath,
     Body: file,
-    // ACL: "public-read",
   };
-  console.log(_params, "params123");
   return S3.upload(_params).promise();
 }
 module.exports.uploadToS3 = uploadToS3;

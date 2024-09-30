@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../actions/user.action");
-const { getImage, generateImage } = require("../actions/image.action");
+const {
+  getImage,
+  generateImage,
+  deleteImage,
+} = require("../actions/image.action");
 const multer = require("multer");
 
 const storage = multer.memoryStorage();
@@ -14,5 +18,6 @@ router.post(
   upload.single("file"),
   generateImage
 );
+router.post("/deleteImage", authenticateToken, deleteImage);
 
 module.exports = router;

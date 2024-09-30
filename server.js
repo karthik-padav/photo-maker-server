@@ -17,13 +17,15 @@ app.use("/", require("./routes/default"));
 // app.use(errorHandler);
 
 const Image = require("./routes/imagesRoutes");
+const Controler = require("./routes/controlerRoutes");
 
 app.use(
   bodyParser.json({ limit: "30mb", extended: true }),
   bodyParser.urlencoded({ limit: "30mb", extended: true }),
   errorHandler,
   cors(),
-  Image
+  Image,
+  Controler
 );
 
 app.listen(port, () => {

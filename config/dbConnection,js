@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 
 const connectDb = async () => {
   try {
-    const connect = await mongoose.connect(process.env.MONGODB_URL);
+    const connect = await mongoose.connect(process.env.MONGODB_URL, {
+      // Add additional options
+      maxPoolSize: 20, // Set the max number of connections in the pool
+      useNewUrlParser: true, // Option to use the new MongoDB connection string parser
+      useUnifiedTopology: true, // Option for using the new server discovery and monitoring engine
+    });
     console.log(
       "Database connected: ",
       connect.connection.host,
