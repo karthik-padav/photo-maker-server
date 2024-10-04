@@ -30,10 +30,6 @@ app.use(
   User
 );
 
-cron.schedule("*/30 * * * *", () => {
-  console.log("Running a task every 30 minutes");
-});
-
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
