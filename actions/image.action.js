@@ -48,15 +48,19 @@ const generateImage = asyncHandler(async (req, res) => {
 });
 
 const getImage = asyncHandler(async (req, res) => {
-  if (!req?.user?.email)
-    res.status(404).json({ message: "Email id not found." });
-  else {
-    console.log(req.user, "req.user");
-    const images = await Image.find({
-      email: req.user.email,
-      active: true,
-    }).select("email _id imageKey");
-    res.status(200).json(images);
+  try {
+    if (!req?.user?.email)
+      res.status(404).json({ message: "Email id not found." });
+    else {
+      console.log(req.user, "req.user");
+      const images = await Image.find({
+        email: req.user.email,
+        active: true,
+      }).select("email _id imageKey");
+      res.status(200).json(images);
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
 
