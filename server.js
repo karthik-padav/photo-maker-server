@@ -12,12 +12,13 @@ const port = process.env.PORT || 3000;
 
 // app.use(express.json());
 app.use("/", require("./routes/default"));
-
+const cron = require("node-cron");
 // app.use("/api/image", require("./routes/imagesRoutes"));
 // app.use(errorHandler);
 
 const Image = require("./routes/imagesRoutes");
 const Controler = require("./routes/controlerRoutes");
+const User = require("./routes/userRoutes");
 
 app.use(
   bodyParser.json({ limit: "30mb", extended: true }),
@@ -25,8 +26,13 @@ app.use(
   errorHandler,
   cors(),
   Image,
-  Controler
+  Controler,
+  User
 );
+
+cron.schedule("*/30 * * * *", () => {
+  console.log("Running a task every 30 minutes");
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

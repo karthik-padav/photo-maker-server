@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
+const User = require("../models/user.model.js");
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -21,4 +21,34 @@ function authenticateToken(req, res, next) {
   );
 }
 
+async function getUser(req, res) {
+  if (!req?.user?.email)
+    res.status(404).json({ message: "Email id not found." });
+  else {
+    const user = await User.findOne({
+      email: req.user.email,
+      active: true,
+    });
+    res.status(200).json(user);
+  }
+}
+
+// async function name(params) {
+
+// }
+
+// const deleteImage = asyncHandler(async (req, res) => {
+//   if (!req?.user?.email)
+//     res.status(404).json({ message: "Email id not found." });
+//   else {
+//     const images = await Image.findByIdAndUpdate(
+//       req.body.id,
+//       { $set: { active: false } },
+//       { new: true, runValidators: true }
+//     );
+//     res.status(200).json(images);
+//   }
+// });
+
 module.exports.authenticateToken = authenticateToken;
+module.exports.getUser = getUser;
