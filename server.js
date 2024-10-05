@@ -18,8 +18,17 @@ const Image = require("./routes/imagesRoutes");
 const Controler = require("./routes/controlerRoutes");
 const User = require("./routes/userRoutes");
 
+const whitelist = ["https://dpg.vercel.app", "http://localhost:3001"];
+
 const corsOptions = {
-  origin: "https://dpg.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
