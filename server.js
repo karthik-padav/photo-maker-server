@@ -15,8 +15,8 @@ app.use("/", require("./routes/default"));
 // const cron = require("node-cron");
 
 const Image = require("./routes/imagesRoutes");
-const Controler = require("./routes/controlerRoutes");
-// const User = require("./routes/userRoutes");
+// const Controler = require("./routes/controlerRoutes");
+const User = require("./routes/userRoutes");
 
 app.use(
   bodyParser.json({ limit: "30mb", extended: true }),
@@ -24,8 +24,8 @@ app.use(
   errorHandler,
   cors(),
   Image,
-  Controler
-  // User
+  // Controler
+  User
 );
 
 app.listen(port, () => {
