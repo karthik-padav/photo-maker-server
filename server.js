@@ -14,8 +14,8 @@ const port = process.env.PORT || 3000;
 app.use("/", require("./routes/default"));
 // const cron = require("node-cron");
 
-const Image = require("./routes/imagesRoutes");
-// const Controler = require("./routes/controlerRoutes");
+// const Image = require("./routes/imagesRoutes");
+const Controler = require("./routes/controlerRoutes");
 const User = require("./routes/userRoutes");
 
 app.use(
@@ -23,8 +23,8 @@ app.use(
   bodyParser.urlencoded({ limit: "30mb", extended: true }),
   errorHandler,
   cors(),
-  Image,
-  // Controler
+  // Image,
+  Controler,
   User
 );
 
