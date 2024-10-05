@@ -1,7 +1,6 @@
 const Image = require("../models/image.model.js");
 const asyncHandler = require("express-async-handler");
 
-const { default: axios } = require("axios");
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
 
