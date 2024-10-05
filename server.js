@@ -18,11 +18,18 @@ const Image = require("./routes/imagesRoutes");
 const Controler = require("./routes/controlerRoutes");
 const User = require("./routes/userRoutes");
 
+const corsOptions = {
+  origin: "https://dpg.vercel.app",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
 app.use(
   bodyParser.json({ limit: "30mb", extended: true }),
   bodyParser.urlencoded({ limit: "30mb", extended: true }),
   errorHandler,
-  cors(),
+  cors(corsOptions),
   Image,
   Controler,
   User
