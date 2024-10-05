@@ -6,28 +6,6 @@ const { uid } = require("uid");
 
 const generateImage = asyncHandler(async (req, res) => {
   try {
-    //   let client;
-    //   try {
-    //     ({ client } = await importDynamic("@gradio/client"));
-    //   } catch (error) {
-    //     console.error("Error loading module:", error);
-    //     res.status(500).json(error);
-    //     return;
-    //   }
-
-    // const HF_TOKEN = process.env.HF_TOKEN;
-    // const app = await client(process.env.HUGGING_FACE_SPACE_URL, {
-    //   hf_token: HF_TOKEN,
-    // });
-    // const result = await app.predict("/predict", [req.file.buffer]);
-
-    // const imgURL = `${process.env.HUGGING_FACE_SPACE_URL}file=${result?.data?.[0]?.path}`;
-
-    // const bgRmImg = await axios.get(imgURL, {
-    //   headers: { Authorization: `Bearer ${HF_TOKEN}` },
-    //   responseType: "arraybuffer",
-    // });
-
     const filename = `${uid(16)}.png`;
     const s3Resp = await uploadToS3({
       file: req.file.buffer,
