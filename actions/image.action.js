@@ -9,7 +9,7 @@ const generateImage = asyncHandler(async (req, res) => {
     const filename = `${uid(16)}.png`;
     const s3Resp = await uploadToS3({
       file: req.file.buffer,
-      filePath: `my-photos/${filename}`,
+      filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
     });
 
     const imageDetails = await Image.create({
