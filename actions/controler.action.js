@@ -27,7 +27,7 @@ const createControler = asyncHandler(async (req, res) => {
       const filename = `${uid(16)}.png`;
       const s3Resp = await uploadToS3({
         file: req.file.buffer,
-        filePath: `my-downloads/${filename}`,
+        filePath: `${process.env.S3_DIR}/my-downloads/${filename}`,
       });
       if (s3Resp.Key || s3Resp.key) {
         photo = {
