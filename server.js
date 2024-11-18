@@ -12,7 +12,11 @@ const port = process.env.PORT || 3000;
 
 // app.use(express.json());
 app.use("/", require("./routes/default"));
-// const cron = require("node-cron");
+
+const cron = require("node-cron");
+cron.schedule("* * * * *", () => {
+  console.log("running a task every minute");
+});
 
 const Image = require("./routes/imagesRoutes");
 const Controler = require("./routes/controlerRoutes");
