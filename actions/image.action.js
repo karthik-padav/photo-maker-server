@@ -1,6 +1,5 @@
 const Image = require("../models/image.model.js");
 const asyncHandler = require("express-async-handler");
-const { removeBackground } = require("@imgly/background-removal-node");
 
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
@@ -11,7 +10,8 @@ const generateImage = asyncHandler(async (req, res) => {
     const originalImageBlob = new Blob([req.file.buffer], {
       type: "image/png",
     });
-    const rmbgImageBlob = await removeBackground(originalImageBlob);
+    // const rmbgImageBlob = await removeBackground(originalImageBlob);
+    const rmbgImageBlob = originalImageBlob;
     console.log(req.user, "req.user123");
     if (rmbgImageBlob) {
       const arrayBuffer = await rmbgImageBlob.arrayBuffer();
