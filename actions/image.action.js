@@ -1,5 +1,6 @@
 const Image = require("../models/image.model.js");
 const asyncHandler = require("express-async-handler");
+const { removeBackground } = require("@imgly/background-removal-node");
 
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
@@ -7,18 +8,26 @@ const { uid } = require("uid");
 const generateImage = asyncHandler(async (req, res) => {
   try {
     const filename = `${uid(16)}.png`;
-    const s3Resp = await uploadToS3({
-      file: req.file.buffer,
-      filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
+    const originalImageBlob = new Blob([req.file.buffer], {
+      type: "image/png",
     });
+    const rmbgImageBlob = await removeBackground(originalImageBlob);
+    console.log(req.user, "req.user123");
+    if (rmbgImageBlob) {
+      const arrayBuffer = await rmbgImageBlob.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const s3Resp = await uploadToS3({
+        file: buffer,
+        filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
+      });
 
-    const imageDetails = await Image.create({
-      email: req.user.email,
-      imageKey: s3Resp.Key || s3Resp.key,
-      bucket: s3Resp.Bucket,
-    });
-
-    res.status(200).json(imageDetails);
+      const imageDetails = await Image.create({
+        email: req.user.email,
+        imageKey: s3Resp.Key || s3Resp.key,
+        bucket: s3Resp.Bucket,
+      });
+      res.status(200).json(imageDetails);
+    }
   } catch (error) {
     res.status(500).json(error);
   }
