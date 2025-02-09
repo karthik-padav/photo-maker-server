@@ -7,18 +7,19 @@ const { uid } = require("uid");
 const generateImage = asyncHandler(async (req, res) => {
   try {
     const filename = `${uid(16)}.png`;
-    const s3Resp = await uploadToS3({
-      file: req.file.buffer,
-      filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
-    });
+    if (req.file.buffer) {
+      const s3Resp = await uploadToS3({
+        file: req.file.buffer,
+        filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
+      });
 
-    const imageDetails = await Image.create({
-      email: req.user.email,
-      imageKey: s3Resp.Key || s3Resp.key,
-      bucket: s3Resp.Bucket,
-    });
-
-    res.status(200).json(imageDetails);
+      const imageDetails = await Image.create({
+        email: req.user.email,
+        imageKey: s3Resp.Key || s3Resp.key,
+        bucket: s3Resp.Bucket,
+      });
+      res.status(200).json(imageDetails);
+    }
   } catch (error) {
     res.status(500).json(error);
   }
