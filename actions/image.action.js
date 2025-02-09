@@ -7,17 +7,9 @@ const { uid } = require("uid");
 const generateImage = asyncHandler(async (req, res) => {
   try {
     const filename = `${uid(16)}.png`;
-    const originalImageBlob = new Blob([req.file.buffer], {
-      type: "image/png",
-    });
-    // const rmbgImageBlob = await removeBackground(originalImageBlob);
-    const rmbgImageBlob = originalImageBlob;
-    console.log(req.user, "req.user123");
-    if (rmbgImageBlob) {
-      const arrayBuffer = await rmbgImageBlob.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+    if (req.file.buffer) {
       const s3Resp = await uploadToS3({
-        file: buffer,
+        file: req.file.buffer,
         filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
       });
 
