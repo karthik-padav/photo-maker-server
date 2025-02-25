@@ -1,33 +1,21 @@
 const express = require("express");
+require("dotenv").config(); // ✅ Correct dotenv import
 const errorHandler = require("./midleware/errorHandler");
-const connectDb = require("./config/dbConnection,js");
-const dotenv = require("dotenv").config();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-// const cron = require("node-cron");
 
-connectDb();
+// Uncomment if using a database
+// const connectDb = require("./config/dbConnection");
+// connectDb();
+
 const app = express();
-
 const port = process.env.PORT || 3000;
 
-// app.use(express.json());
-app.use("/", require("./routes/default"));
-
-// cron.schedule("* * * * *", () => {
-//   console.log("running a task every minute");
-// });
-
-const Image = require("./routes/imagesRoutes");
-const Controler = require("./routes/controlerRoutes");
-const User = require("./routes/userRoutes");
-
-const whitelist = ["https://dpg.vercel.app", "http://localhost:3001"];
-
+// ✅ Define CORS before routes
+const whitelist = ["https://dpg.vercel.app", "http://localhost:3000"];
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (whitelist.indexOf(origin) !== -1) {
+    if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -38,16 +26,20 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(
-  bodyParser.json({ limit: "30mb", extended: true }),
-  bodyParser.urlencoded({ limit: "30mb", extended: true }),
-  errorHandler,
-  cors(corsOptions),
-  Image,
-  Controler,
-  User
-);
+// ✅ Use middlewares in correct order
+app.use(cors(corsOptions));
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+
+// ✅ Load routes after middleware
+app.use("/", require("./routes/default"));
+app.use(require("./routes/imagesRoutes"));
+app.use(require("./routes/controlerRoutes"));
+app.use(require("./routes/userRoutes"));
+
+// ✅ Error handler should be the last middleware
+app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
