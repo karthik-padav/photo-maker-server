@@ -1,8 +1,8 @@
 const Image = require("../models/image.model.js");
 const asyncHandler = require("express-async-handler");
-
 const { uploadToS3 } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
+const { pool } = require("../config/dbConnection.js");
 
 const generateImage = asyncHandler(async (req, res) => {
   try {
@@ -10,15 +10,27 @@ const generateImage = asyncHandler(async (req, res) => {
     if (req.file.buffer) {
       const s3Resp = await uploadToS3({
         file: req.file.buffer,
-        filePath: `${process.env.S3_DIR}/my-photos/${filename}`,
+        filePath: `${process.env.S3_DIR}/my-photos/${req.user.id}/${filename}`,
       });
 
-      const imageDetails = await Image.create({
-        email: req.user.email,
-        imageKey: s3Resp.Key || s3Resp.key,
-        bucket: s3Resp.Bucket,
-      });
-      res.status(200).json(imageDetails);
+      const sql = `
+        INSERT INTO Image (id, userId, bucket, imagePath)
+        VALUES (?, ?, ?, ?)`;
+
+      const imageId = uid(16);
+      const [result] = await pool.execute(sql, [
+        imageId,
+        req.user.id,
+        s3Resp.Bucket,
+        s3Resp.Key || s3Resp.key,
+      ]);
+      if (result.affectedRows > 0) {
+        const [rows] = await pool.execute("SELECT * FROM Image WHERE id = ?", [
+          imageId,
+        ]);
+        if (rows.length) res.status(200).json(rows[0]);
+        else res.status(200).json({});
+      }
     }
   } catch (error) {
     res.status(500).json(error);
@@ -30,15 +42,14 @@ const getImage = asyncHandler(async (req, res) => {
     if (!req?.user?.email)
       res.status(404).json({ message: "Email id not found." });
     else {
-      console.log(req.user, "req.user");
-      const images = await Image.find({
-        email: req.user.email,
-        active: true,
-      }).select("email _id imageKey");
-      res.status(200).json(images);
+      const [rows] = await pool.execute(
+        "SELECT * FROM Image WHERE userId = ? and isActive = 1",
+        [req.user.id]
+      );
+      res.status(200).json(rows);
     }
   } catch (error) {
-    console.log(error);
+    res.status(500).json(error);
   }
 });
 
@@ -46,12 +57,14 @@ const deleteImage = asyncHandler(async (req, res) => {
   if (!req?.user?.email)
     res.status(404).json({ message: "Email id not found." });
   else {
-    const images = await Image.findByIdAndUpdate(
-      req.body.id,
-      { $set: { active: false } },
-      { new: true, runValidators: true }
-    );
-    res.status(200).json(images);
+    const sql = `
+      Update Image
+      set isActive = 0
+      where id = ?`;
+    const [result] = await pool.execute(sql, [req.body.id]);
+    if (result.affectedRows > 0) res.status(200).json({ id: req.body.id });
+    else
+      res.status(404).json({ message: "Image not found or no changes made." });
   }
 });
 

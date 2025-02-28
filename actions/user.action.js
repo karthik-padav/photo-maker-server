@@ -1,54 +1,64 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user.model.js");
+const { pool } = require("../config/dbConnection");
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) return res.status(401).json({ message: "Token missing" });
+
   jwt.verify(
     token,
     process.env.NEXT_AUTH_SECRET,
     { algorithms: ["HS384"] },
     async (err, user) => {
-      if (err) return res.status(401).json({ err, message: "Unauthorized." });
-      else if (user?.email) {
-        const _user = await User.find({ email: user.email });
-        if (_user.length) {
-          req.user = _user[0];
-          next();
-        } else res.status(404).json({ message: "User not found." });
-      } else res.status(404).json({ message: "Email id not found." });
+      if (err)
+        return res.status(401).json({ message: "Unauthorized", error: err });
+
+      if (user?.email) {
+        try {
+          const [rows] = await pool.execute(
+            "SELECT * FROM User WHERE email = ?",
+            [user.email]
+          );
+
+          if (rows.length) {
+            req.user = rows[0];
+            return next();
+          } else {
+            return res.status(404).json({ message: "User not found." });
+          }
+        } catch (dbError) {
+          return res
+            .status(500)
+            .json({ message: "Database error", error: dbError });
+        }
+      } else {
+        return res
+          .status(404)
+          .json({ message: "Email ID not found in token." });
+      }
     }
   );
 }
 
 async function getUser(req, res) {
-  if (!req?.user?.email)
-    res.status(404).json({ message: "Email id not found." });
-  else {
-    const user = await User.findOne({
-      email: req.user.email,
-      active: true,
-    });
-    res.status(200).json(user);
+  if (!req?.user?.email) {
+    return res.status(404).json({ message: "Email ID not found." });
+  }
+
+  try {
+    const [rows] = await pool.execute(
+      "SELECT * FROM User WHERE email = ? and isActive = 1",
+      [req.user.email]
+    );
+    if (!rows.length) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    res.status(200).json(rows[0]);
+  } catch (dbError) {
+    return res.status(500).json({ message: "Database error", error: dbError });
   }
 }
 
-// async function name(params) {
-
-// }
-
-// const deleteImage = asyncHandler(async (req, res) => {
-//   if (!req?.user?.email)
-//     res.status(404).json({ message: "Email id not found." });
-//   else {
-//     const images = await Image.findByIdAndUpdate(
-//       req.body.id,
-//       { $set: { active: false } },
-//       { new: true, runValidators: true }
-//     );
-//     res.status(200).json(images);
-//   }
-// });
-
-module.exports.authenticateToken = authenticateToken;
-module.exports.getUser = getUser;
+module.exports = { authenticateToken, getUser };

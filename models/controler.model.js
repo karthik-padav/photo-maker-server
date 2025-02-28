@@ -4,7 +4,7 @@ const controlerSchema = new mongoose.Schema(
   {
     controler: { type: JSON, required: true },
     email: { type: String, required: true },
-    downloadedImageKey: { type: String, required: true },
+    downloadedImagePath: { type: String, required: true },
     bucket: { type: String, required: true },
     imageId: {
       type: mongoose.Schema.Types.ObjectId,
