@@ -43,7 +43,7 @@ const getImage = asyncHandler(async (req, res) => {
       res.status(404).json({ message: "Email id not found." });
     else {
       const [rows] = await pool.execute(
-        "SELECT * FROM Image WHERE userId = ? and isActive = 1",
+        "SELECT * FROM Image WHERE userId = ? and isActive = 1 ORDER BY createdAt DESC",
         [req.user.id]
       );
       res.status(200).json(rows);
