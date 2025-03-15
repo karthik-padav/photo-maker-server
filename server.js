@@ -28,8 +28,8 @@ const corsOptions = {
 
 // ✅ Use middlewares in correct order
 app.use(cors(corsOptions));
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(bodyParser.json({ limit: "300mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "300mb", extended: true }));
 
 // ✅ Load routes after middleware
 app.use("/", require("./routes/default"));
