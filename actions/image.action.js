@@ -1,6 +1,6 @@
 const Image = require("../models/image.model.js");
 const asyncHandler = require("express-async-handler");
-const { uploadToS3 } = require("../utils/s3ImageUpload");
+const { uploadToS3, getBgImages } = require("../utils/s3ImageUpload");
 const { uid } = require("uid");
 const { pool } = require("../config/dbConnection.js");
 
@@ -53,6 +53,15 @@ const getImage = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllBgImage = asyncHandler(async (_, res) => {
+  try {
+    const resp = await getBgImages();
+    res.status(200).json(resp);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 const deleteImage = asyncHandler(async (req, res) => {
   if (!req?.user?.email)
     res.status(404).json({ message: "Email id not found." });
@@ -69,5 +78,6 @@ const deleteImage = asyncHandler(async (req, res) => {
 });
 
 module.exports.getImage = getImage;
+module.exports.getAllBgImage = getAllBgImage;
 module.exports.generateImage = generateImage;
 module.exports.deleteImage = deleteImage;
