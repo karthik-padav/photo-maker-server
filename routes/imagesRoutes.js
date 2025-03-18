@@ -5,6 +5,7 @@ const {
   getImage,
   generateImage,
   deleteImage,
+  getAllBgImage,
 } = require("../actions/image.action");
 const multer = require("multer");
 
@@ -12,6 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 router.get("/getImage", authenticateToken, getImage);
+router.get("/getAllBgImage", getAllBgImage);
 router.post(
   "/generateImage",
   authenticateToken,
