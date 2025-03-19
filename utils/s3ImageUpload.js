@@ -49,16 +49,16 @@ async function getBgImages() {
     };
     const region = await getBucketRegion();
     const images = data.Contents.map((item) => {
-      console.log(item.Key, "item.Key");
-      if (item.Key)
+      const isImage = (filename) =>
+        /\.(png|jpg|jpeg|gif|webp|svg|bmp|tiff)$/i.test(filename);
+      if (isImage(item.Key))
         return {
           key: item.Key,
           url: `https://${bucketName}.s3.${region}.amazonaws.com/${item.Key}`,
         };
       return null;
     });
-    // console.log(images);
-    return images;
+    return images.filter((i) => i);
   } catch (error) {
     console.error("Error fetching images:", error);
     return [];
