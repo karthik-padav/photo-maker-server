@@ -32,30 +32,10 @@ async function getBgImages() {
       return [];
     }
 
-    // https://photo-maker.s3.ap-south-1.amazonaws.com/bg-collection/26.jpg
-
-    // https://photo-maker.s3.us-east-1.amazonaws.com/bg-collection/11.jpg
-
-    // Extract and return image URLs
-    const getBucketRegion = async () => {
-      try {
-        const data = await S3.getBucketLocation({
-          Bucket: bucketName,
-        }).promise();
-        return data.LocationConstraint || "us-east-1";
-      } catch (error) {
-        console.error("Error getting bucket region:", error);
-      }
-    };
-    const region = await getBucketRegion();
     const images = data.Contents.map((item) => {
       const isImage = (filename) =>
         /\.(png|jpg|jpeg|gif|webp|svg|bmp|tiff)$/i.test(filename);
-      if (isImage(item.Key))
-        return {
-          key: item.Key,
-          url: `https://${bucketName}.s3.${region}.amazonaws.com/${item.Key}`,
-        };
+      if (isImage(item.Key)) return { key: item.Key };
       return null;
     });
     return images.filter((i) => i);

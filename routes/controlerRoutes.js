@@ -3,7 +3,7 @@ const router = express.Router();
 const { authenticateToken } = require("../actions/user.action");
 const {
   createControler,
-  getContoler,
+  getControler,
   deleteControler,
 } = require("../actions/controler.action");
 const multer = require("multer");
@@ -16,6 +16,6 @@ router.post(
   createControler
 );
 router.post("/deleteControler", authenticateToken, deleteControler);
-router.get("/getControler", authenticateToken, getContoler);
+router.get("/getControler", authenticateToken, getControler);
 
 module.exports = router;
