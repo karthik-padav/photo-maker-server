@@ -6,6 +6,29 @@ const { uploadToS3 } = require("../utils/s3ImageUpload.js");
 const { uid } = require("uid");
 const { pool } = require("../config/dbConnection.js");
 
+const controlerFields = [
+  "id",
+  "userId",
+  "imageId",
+  "borderRadius",
+  "imageWrapperSize",
+  "rotate",
+  "scale",
+  "pngShadow",
+  "transformX",
+  "transformY",
+  "pngBorderColor",
+  "backgroundColorType",
+  "backgroundColor",
+  "outerBorderColor",
+  "outerBorderOpacity",
+  "outerBorderWidth",
+  "backgroundRotate",
+  "backgroundScale",
+  "downloadedImagePath",
+  "backgroundImagePath",
+];
+
 const createControler = asyncHandler(async (req, res) => {
   try {
     const userId = req.user.id;
@@ -30,88 +53,22 @@ const createControler = asyncHandler(async (req, res) => {
         filePath: `${process.env.S3_DIR}/my-downloads/${userId}/${filename}`,
       });
       if (s3Resp.Key || s3Resp.key) {
-        photo = {
-          downloadedImagePath: s3Resp.Key || s3Resp.key,
-          bucket: s3Resp.Bucket,
-        };
+        photo = { downloadedImagePath: s3Resp.Key || s3Resp.key };
       }
     }
 
     const sql = `
-    INSERT INTO Controler (
-      id,
-      userId,
-      imageId, 
-      borderTitle,
-      borderValue,
-      imageWrapperSize,
-      rotate,
-      scale,
-      pngShadow,
-      transformX,
-      transformY,
-      pngBorderColor,
-      outerBorderColor,
-      outerBorderOpacity,
-      outerBorderWidth,
-      backgroundColorType,
-      backgroundImagePath,
-      backgroundColor,
-      bucket,
-      downloadedImagePath
-      )
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    INSERT INTO Controler (${controlerFields.join(",")})
+    VALUES (${Array(controlerFields.length).fill("?").join(",")})`;
 
-    const {
-      imageId = null,
-      borderTitle = null,
-      borderValue = null,
-      imageWrapperSize = null,
-      rotate = null,
-      scale = null,
-      pngShadow = null,
-      transformX = null,
-      transformY = null,
-      pngBorderColor = null,
-      outerBorderColor = null,
-      outerBorderOpacity = null,
-      outerBorderWidth = null,
-      backgroundColorType = null,
-      backgroundImagePath = null,
-      backgroundColor = null,
-      bucket = null,
-      downloadedImagePath = null,
-    } = { ...jsonData, ...photo };
-
-    console.log({ ...jsonData, ...photo }, "{ ...jsonData, ...photo }");
-
+    const id = uid(16);
+    const mergedData = { ...jsonData, ...photo, id, userId };
     try {
-      const id = uid(16);
       const [result] = await pool.execute(sql, [
-        id,
-        userId,
-        imageId,
-        borderTitle,
-        borderValue,
-        imageWrapperSize,
-        rotate,
-        scale,
-        pngShadow,
-        transformX,
-        transformY,
-        pngBorderColor,
-        outerBorderColor,
-        outerBorderOpacity,
-        outerBorderWidth,
-        backgroundColorType,
-        backgroundImagePath,
-        backgroundColor,
-        bucket,
-        downloadedImagePath,
+        ...controlerFields.map((i) => mergedData[i] || null),
       ]);
-      console.log(result, "result123");
       if (result.affectedRows > 0)
-        res.status(200).json({ id, userId, ...jsonData, ...photo });
+        res.status(200).json({ userId, ...mergedData });
       res.status(500).json({ message: "No rows affected." });
     } catch (error) {
       console.log(error, "error123");
@@ -122,7 +79,7 @@ const createControler = asyncHandler(async (req, res) => {
   }
 });
 
-const getContoler = asyncHandler(async (req, res) => {
+const getControler = asyncHandler(async (req, res) => {
   try {
     if (!req?.user?.email)
       res.status(404).json({ message: "Email id not found." });
@@ -136,8 +93,7 @@ const getContoler = asyncHandler(async (req, res) => {
             'id', C.id,
             'userId', C.userId,
             'imageId', C.imageId,
-            'borderTitle', C.borderTitle,
-            'borderValue', C.borderValue,
+            'borderRadius', C.borderRadius,
             'imageWrapperSize', C.imageWrapperSize,
             'rotate', C.rotate,
             'scale', C.scale,
@@ -158,7 +114,6 @@ const getContoler = asyncHandler(async (req, res) => {
         'image', JSON_OBJECT(
             'id', I.id,
             'userId', I.userId,
-            'bucket', I.bucket,
             'imagePath', I.imagePath
         )
             ) AS result
@@ -196,5 +151,5 @@ const deleteControler = asyncHandler(async (req, res) => {
 });
 
 module.exports.createControler = createControler;
-module.exports.getContoler = getContoler;
+module.exports.getControler = getControler;
 module.exports.deleteControler = deleteControler;
