@@ -12,7 +12,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ✅ Define CORS before routes
-const whitelist = ["https://dpg.vercel.app", "http://localhost:3000"];
+const whitelist = [
+  "https://dpg.vercel.app",
+  "http://localhost:3000",
+  "https://imageflexstudio.com",
+];
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || whitelist.includes(origin)) {
