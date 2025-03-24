@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 const whitelist = [
   "https://dpg.vercel.app",
   "http://localhost:3000",
-  "https://imageflexstudio.com",
+  "https://www.imageflexstudio.com",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
