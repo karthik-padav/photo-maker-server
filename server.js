@@ -14,6 +14,7 @@ const port = process.env.PORT || 3000;
 // ✅ Define CORS before routes
 const whitelist = [
   "https://dpg.vercel.app",
+  "https://dpg-dev.vercel.app",
   "http://localhost:3000",
   "https://www.imageflexstudio.com",
 ];
