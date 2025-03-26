@@ -17,6 +17,7 @@ const whitelist = [
   "https://dpg-dev.vercel.app",
   "http://localhost:3000",
   "https://www.imageflexstudio.com",
+  "https://photo-maker-git-main-karthik-padavs-projects.vercel.app/",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
