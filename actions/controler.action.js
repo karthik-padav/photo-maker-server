@@ -15,7 +15,6 @@ const controlerFields = [
   "rotate",
   "scale",
   "pngShadow",
-  "pngShadowOpacity",
   "transformX",
   "transformY",
   "pngBorderColor",
@@ -102,7 +101,6 @@ const getControler = asyncHandler(async (req, res) => {
             'transformX', C.transformX,
             'transformY', C.transformY,
             'pngBorderColor', C.pngBorderColor,
-            'pngShadowOpacity', C.pngShadowOpacity,
             'backgroundColorType', C.backgroundColorType,
             'backgroundColor', C.backgroundColor,
             'outerBorderColor', C.outerBorderColor,
@@ -130,6 +128,7 @@ const getControler = asyncHandler(async (req, res) => {
         `,
         [req.user.id]
       );
+      console.log(rows, "rows123");
       res.status(200).json(rows.map((i) => i.result));
     }
   } catch (error) {
